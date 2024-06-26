@@ -8,7 +8,7 @@ Nishide M, Nishimura K, et al, "Neutrophil single-cell analysis identifies a uni
 ## Software requirements
 ・R version 4.1.0
 ・Seurat (v4.2.0)
-・miloR (v3.15)
+・miloR (v1.5.0)
 ・nichentr (v1.1.1)
 ・Monocle3 (v1.0.0)
 
