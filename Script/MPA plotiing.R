@@ -10,7 +10,7 @@ library(monocle3)
 library(SeuratWrappers)
 library(dittoSeq)
 
-#For plotting PBMC with ISG/monocyte signature###
+#For Heatmap analysis###
 all <- FindAllMarkers(subset(s.int,downsample=20000),only.pos = TRUE,
                           logfc.threshold = 0.25, min.pct=0.25, max.cells.per.ident=5000)
 
@@ -26,7 +26,6 @@ pp <- DotPlot(s.int,features=Y,scale.by="size", scale=T,col.max=5, col.min=-5)+
   scale_colour_gradient2(low="blue", mid="white", high="red", midpoint=0)
 ggsave('Fig2B.png',pp, width=5.5, height=5.5)
 
-#Read PBMC_ind as s.int
 pp <- dittoHeatmap(subset(s.int, idents=c("AI143","AI193","AI54","AI55","AI62","AI75","HD"),
                     downsample=1000),
              genes=rownames(s.markerssct),
@@ -38,7 +37,6 @@ pp <- dittoHeatmap(subset(s.int, idents=c("AI143","AI193","AI54","AI55","AI62","
 pp
 ggsave('Fig.4A.png', pp, width=15, height=11.2)
 
-#Read PBMC_ind as s.int
 pp <- dittoHeatmap(subset(s.int, idents=c("AI143","AI193","AI54","AI55","AI62","AI75","HD"),
                           downsample=1000),
                    genes=c("MMP9","PADI4","RFLNB","ALOX5AP","MME","HMGB2","FCN1","VIM","APMAP","CDA","QPCT","PLP2","CYP4F3","CKAP4"),
@@ -51,7 +49,6 @@ pp <- dittoHeatmap(subset(s.int, idents=c("AI143","AI193","AI54","AI55","AI62","
 pp
 ggsave('Fig.S9b.png', pp, width=10, height=3)
 
-#Read PBMC_ind as s.int
 pp <- dittoHeatmap(subset(s.int, idents=c("AI143","AI193","AI54","AI55","AI62","AI75","HD"),
                           downsample=1000),
                    genes=c("APOL6",
@@ -81,7 +78,6 @@ pp <- dittoHeatmap(subset(s.int, idents=c("AI143","AI193","AI54","AI55","AI62","
                    border_color="black")
 pp
 ggsave('Fig.s9a.png', pp, width=10, height=3.8)
-
 
 #Enrichment score analysis
 features <- list(c("MPO","AZU1","ELANE","LTF","TOP2A","CEACAM8","CEBPE"))
