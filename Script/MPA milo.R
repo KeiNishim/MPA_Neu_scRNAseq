@@ -6,8 +6,8 @@ library(dplyr)
 library(patchwork)
 library(Seurat)
 
-#Read mono_ind as s.sub
-pbmc_small_sce <- as.SingleCellExperiment(s.neu, dimreducs = c("pca","umap"), graphs=c("integrated_snn", "integrated_nn"), assay="integrated")
+#Use seurat object from MPA clustering.R
+pbmc_small_sce <- as.SingleCellExperiment(s.int, dimreducs = c("pca","umap"), graphs=c("integrated_snn", "integrated_nn"), assay="integrated")
 traj_milo <- Milo(pbmc_small_sce)
 plotUMAP(traj_milo, colour_by="disease", point_size=0.1)
 traj_milo <- buildGraph(traj_milo, k = 10, d = 15, reduced.dim="PCA")
