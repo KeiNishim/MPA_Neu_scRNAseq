@@ -55,6 +55,8 @@ samples_rna <- PrepSCTIntegration(object.list = samples_rna, anchor.features = f
 rna.anchors <- FindIntegrationAnchors(object.list = samples_rna, normalization.method='SCT', 
                                       anchor.features = features_RNA, reduction="cca", dims=1:20)
 s.int <- IntegrateData(anchorset = rna.anchors, normalization.method="SCT")
+#Then integrate RNA and ADT file as s.int
+
 
 #Run PCA analysis
 #######################################
