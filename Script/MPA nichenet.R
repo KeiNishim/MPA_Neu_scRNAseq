@@ -17,6 +17,7 @@ library(circlize)
 library(nichenetr)
 library(tidyverse)
 
+##Use seurat object from MPA clustering.R
 lr_network = readRDS(url("https://zenodo.org/record/3260758/files/lr_network.rds"))
 s.int <- RenameIdents(s.int, "Neutrophil_1"="Neutrophil", "Neutrophil_2"="Neutrophil","Myelocyte"="Neutrophil", "CD4 Naive"="CD4Naive","CD4 Memory"="CD4Memory",
                       "CD8 Naive/TCM"="CD8NaiveTCM", "CD8 TEM/CTL"="CD8TEMCTL","CD14 Mono"="CD14Mono","CD16 Mono"="CD16Mono"
