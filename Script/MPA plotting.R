@@ -11,6 +11,7 @@ library(SeuratWrappers)
 library(dittoSeq)
 
 #For Heatmap analysis###
+#Use seurat object from MPA clustering.R
 all <- FindAllMarkers(subset(s.int,downsample=20000),only.pos = TRUE,
                           logfc.threshold = 0.25, min.pct=0.25, max.cells.per.ident=5000)
 
