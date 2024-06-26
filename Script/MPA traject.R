@@ -1,6 +1,6 @@
 library(velocyto.R)
 
-
+#Use seurat object from MPA clustering.R
 #SeuratWrappers####
 cds <- as.cell_data_set(s.neu)
 cds <- cluster_cells(cds, reduction_method="UMAP")
