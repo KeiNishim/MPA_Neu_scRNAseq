@@ -65,7 +65,8 @@ s.int <- RunPCA(s.int, verbose=TRUE)
 s.int <- FindNeighbors(s.int, reduction="pca")
 s.int <- RunUMAP(s.int, reduction="pca", dims=1:15)
 
-#Then manually remove doublet and dead cells
+#Then manually remove doublet and dead cells.
+#Neutrophil populations are subsetted and re-clustered.  Then they are saved as s.neu.
 
 pp <-DimPlot(subset(s.int, idents=c("HD","MPA"),downsample=74406), group.by="seurat_clusters",split.by="disease")
 pp
