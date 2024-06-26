@@ -9,6 +9,7 @@ library(tidyr)
 library(monocle3)
 library(SeuratWrappers)
 
+#Read BD Rhapsody output files (sample_info includes file_path, disease name and sample name)
 #################################################
 load_and_prep_ADT <- function(x){
   counts <- read.table( x['path'], skip=6, sep = ",", header = TRUE, row.names = 1)
@@ -33,9 +34,6 @@ samples_rna <- apply(sample_info, 1, load_and_prep_RNA)
 
 
 #Integration for ADT
-## if using RPCA ################################################
-gc()
-
 features_ADT <- rownames(samples_adt[[1]])
 for(i in 1:14){
   features_ADT <- intersect(features_ADT, rownames(samples_adt[[i]]))
@@ -47,11 +45,6 @@ samples_adt <- lapply(X=samples_adt, FUN=function(x){
 adt.anchors <- FindIntegrationAnchors(object.list = samples_adt, 
                                       anchor.features=features_ADT,reduction="rpca",ref=c(1,3,5,7,11),dims=1:12)
 s.int <- IntegrateData(anchorset = adt.anchors, dims=1:12)
-gc()
-
-saveRDS(samples_adt, "samples_adt.rds")
-saveRDS(samples_rna, "samples_rna.rds")
-gc()
 
 #Integration for RNA (SCTransform)
 samples_rna <- lapply(X=samples_rna, FUN=NormalizeData)
@@ -69,16 +62,14 @@ DefaultAssay(s.int) <- "integrated"
 s.int <- RunPCA(s.int, verbose=TRUE)
 s.int <- FindNeighbors(s.int, reduction="pca")
 s.int <- RunUMAP(s.int, reduction="pca", dims=1:15)
-DimPlot(s.int, reduction = 'umap',label = TRUE, repel = TRUE, label.size = 3, pt.size=0.1, shuffle=T)
+
+#Then manually remove doublet and dead cells
 
 pp <-DimPlot(subset(s.int, idents=c("HD","MPA"),downsample=74406), group.by="seurat_clusters",split.by="disease")
 pp
 ggsave('Fig.1b.png',pp, width=8.5, height=4.8)
 write.csv(table(s.int@meta.data$sample, s.int@meta.data$seurat_clusters),"MPAall_population.csv")
 
-s.int <- RenameIdents(s.int, "Neutrophil_1"="Neutrophil_1","Neutrophil_2"="Neutrophil_2","CD14 Mono"="CD14 Mono","CD16 Mono"="CD16 Mono",
-                      "Eosino/Baso"="Eosino/Baso","Myelocyte"="Myelocyte","cDC"="cDC","pDC"="pDC","CD4 Naive"="CD4 Naive","CD4 Memory"="CD4 Memory",
-                      "CD8 Naive/TCM"="CD8 Naive/TCM","CD8 TEM/CTL"="CD8 TEM/CTL","NK"="NK","Bcell"="Bcell","PBPC"="PBPC")
 all <- FindAllMarkers(subset(s.int,downsample=50000),only.pos = TRUE,
                       logfc.threshold = 0.25, min.pct=0.25, max.cells.per.ident=5000)
 
@@ -161,7 +152,6 @@ pp <-DimPlot(subset(s.int, idents=rownames(table(s.int@meta.data[["sample"]])),d
 pp
 ggsave('FigS4-2.png',pp, width=40, height=4.8)
 
-s.int <- subset(s.int, subset=nFeature_RNA>500)
 s.int <- subset(s.int, idents=c("HD","MPA"), downsample=50000)
 pp <- FeaturePlot(s.int, reduction="umap",features = c("MPO","MMP9"), max.cutoff="q99",ncol=3, split.by="disease")
 pp
@@ -205,8 +195,7 @@ pp <- DotPlot(s.int,features=Y,scale.by="size", scale=T,col.max=5, col.min=-5)+
 pp
 ggsave('FigS7-1.png',pp, width=5, height=5)
 
-pp <- DotPlot(s.int,features=rev(c(
-                                   "CD11b.ICRF44.ITGAM.AHS0184.pAbO","CD14.MPHIP9.CD14.AHS0037.pAbO","CD62L.DREG.56.SELL.AHS0049.pAbO",
+pp <- DotPlot(s.int,features=rev(c( "CD11b.ICRF44.ITGAM.AHS0184.pAbO","CD14.MPHIP9.CD14.AHS0037.pAbO","CD62L.DREG.56.SELL.AHS0049.pAbO",
                                    "CD11c.B.LY6.ITGAX.AHS0056.pAbO",
                                    "CD16.3G8.FCGR3A.AHS0053.pAbO","HLA.DR.CD74.AHS0035.pAbO",
                                    "FCER1A.FCER1A.AHS0129.pAbO"
@@ -234,32 +223,3 @@ scale.by="size", scale=T,col.max=5, col.min=-5)+
   scale_colour_gradient2(low="blue", mid="white", high="red", midpoint=0)
 pp
 ggsave('FigS4-3.png',pp, width=6.5, height=2.38)
-
-s.sub <- subset(s.int, idents=c("HD"))
-s.sub2 <- subset(s.int, idents=c("MPA"))
-pp1 <- DotPlot(s.sub,group.by="seurat_clusters", features=rev(c(
-  "GBP1","GBP5","MPO","MMP9","PADI4","ITGAM", "FCGR1A","FCGR2A","FCGR3A","FCGR3B"
-)),
-scale.by="size", scale=F,col.max=2, col.min=0, scale.max=100, scale.min=0)+
-  coord_flip()+ theme(axis.text.x = element_text(angle=90,size = 8,vjust=0.5,hjust=1))+ 
-  theme(axis.text.y = element_text(size = 7.5))+scale_size(range=c(0.1,3))+
-  scale_colour_gradient2(low="blue", mid="white", high="red", midpoint=1, limits=c(0,3))
-
-pp2 <- DotPlot(s.sub2,group.by="seurat_clusters", features=rev(c(
-  "GBP1","GBP5","MPO","MMP9","PADI4","ITGAM", "FCGR1A","FCGR2A","FCGR3A","FCGR3B"
-)),
-scale.by="size", scale=F,col.max=2, col.min=0, scale.max=100, scale.min=0)+
-  coord_flip()+ theme(axis.text.x = element_text(angle=90,size = 8,vjust=0.5,hjust=1))+ 
-  theme(axis.text.y = element_text(size = 7.5))+scale_size(range=c(0.1,3))+
-  scale_colour_gradient2(low="blue", mid="white", high="red", midpoint=1,  limits=c(0,5))
-
-pp1
-pp2
-pp1+pp2
-
-##ggsave('FigS7-3.png',pp, width=6.5, height=4)
-
-pp <-DimPlot(s.int, group.by="seurat_clusters", reduction="umap")
-pp
-Sggsave('FigS7.png',pp, width=5.5, height=4.8)
-write.csv(table(s.int$sample, s.int$seurat_clusters), "FigS7.csv")
